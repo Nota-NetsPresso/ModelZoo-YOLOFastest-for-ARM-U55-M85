@@ -97,6 +97,7 @@ class Detect_infer(nn.Module):
     dynamic = False  # force grid reconstruction
     export = False  # export mode
     netspresso = False
+    exp_yolo_fastest = False
 
     def __init__(self, nc=80, anchors=(), ch=(), inplace=True):  # detection layer
         super().__init__()
@@ -110,6 +111,8 @@ class Detect_infer(nn.Module):
         self.inplace = inplace  # use inplace ops (e.g. slice assignment)
 
     def forward(self, x):
+        if self.exp_yolo_fastest:
+            return x
         z = []  # inference output
         for i in range(self.nl):
             if self.netspresso:
@@ -123,6 +126,8 @@ class Detect_infer(nn.Module):
                     self.grid[i] = self._make_grid(nx, ny).to(x[i].device)
 
                 y = x[i].sigmoid()
+                self.grid[i] = self.grid[i].to(device=y.device)
+                self.stride[i] = self.stride[i].to(device=y.device)
                 if self.inplace:
                     y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 + self.grid[i]) * self.stride[i]  # xy
                     y[..., 2:4] = (y[..., 2:4] * 2) * (y[..., 2:4] * 2) * self.anchor_grid[i]  # wh
@@ -138,6 +143,57 @@ class Detect_infer(nn.Module):
     def _make_grid(nx=20, ny=20):
         yv, xv = torch.meshgrid([torch.arange(ny), torch.arange(nx)])
         return torch.stack((xv, yv), 2).view((1, 1, ny, nx, 2)).float()
+
+class Detect_tflite(nn.Module):
+    onnx_dynamic = False  # ONNX export parameter
+
+    def __init__(self, nc=80, anchors=(), stride=(), inplace=True, nl=3, na=3):  # detection layer
+        super().__init__()
+        self.nc = nc  # number of classes
+        self.no = nc + 5  # number of outputs per anchor
+        self.nl = nl # number of detection layers
+        self.na = na  # number of anchors
+        self.grid = [torch.zeros(1)] * self.nl  # init grid
+        a = torch.tensor(anchors).float().view(self.nl, -1, 2)
+        self.register_buffer('anchors', a)  # shape(nl,na,2)
+        self.register_buffer('anchor_grid', a.clone().view(self.nl, 1, -1, 1, 1, 2))  # shape(nl,1,na,1,1,2)
+        self.inplace = inplace  # use in-place ops (e.g. slice assignment)
+        self.stride = stride
+        self.only_infer = False
+    def forward(self, x):
+        if self.only_infer:
+            return x
+        z = []  # inference output
+        for i in range(self.nl):
+            bs, ny, nx, _ = x[i].shape  
+            #print(x[i].shape)
+            x[i] = x[i].view(bs, ny, nx, self.na, self.no).permute(0, 3, 1, 2, 4).contiguous()
+            if not self.training:  # inference
+                if self.grid[i].shape[2:4] != x[i].shape[2:4] or self.onnx_dynamic:
+                    self.grid[i] = self._make_grid(nx, ny).to(x[i].device)
+
+                y = x[i].sigmoid()
+                if self.inplace:
+                    y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 + self.grid[i]) * self.stride[i]  # xy
+                    y[..., 2:4] = (y[..., 2:4] * 2) * (y[..., 2:4] * 2) * self.anchor_grid[i]  # wh
+                else:  # for YOLOv5 on AWS Inferentia https://github.com/ultralytics/yolov5/pull/2953
+                    xy = (y[..., 0:2] * 2. - 0.5 + self.grid[i]) * self.stride[i]  # xy
+                    wh = (y[..., 2:4] * 2) * (y[..., 2:4] * 2)  * self.anchor_grid[i].view(1, self.na, 1, 1, 2)  # wh
+                    y = torch.cat((xy, wh, y[..., 4:]), -1)
+                z.append(y.view(bs, -1, self.no))
+
+        if self.training:
+            return x
+        elif self.onnx_dynamic:
+            return torch.cat(z, 1)
+        else:
+            return (torch.cat(z, 1), x)
+
+    @staticmethod
+    def _make_grid(nx=20, ny=20):
+        yv, xv = torch.meshgrid([torch.arange(ny), torch.arange(nx)])
+        return torch.stack((xv, yv), 2).view((1, 1, ny, nx, 2)).float()
+
     
 class Segment(Detect):
     # YOLOv5 Segment head for segmentation models
@@ -210,7 +266,6 @@ class BaseModel(nn.Module):
             if isinstance(m.anchor_grid, list):
                 m.anchor_grid = list(map(fn, m.anchor_grid))
         return self
-
 
 class DetectionModel(BaseModel):
     # YOLOv5 detection model
