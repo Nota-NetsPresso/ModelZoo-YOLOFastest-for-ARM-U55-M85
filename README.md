@@ -12,7 +12,9 @@
 [1. Install](#1-install) </br>
 [2. Training](#2-training) </br>
 [3. Compress model and export to onnx with PyNetsPresso](#3-compress-model-and-export-to-onnx-with-pynetspresso) </br>
+[4. Benchmark](#4-benchmark) </br>
 </br>
+
 
 ## 0. Sign up
 To get started with the NetsPresso Python package, you will need to sign up either at <a href="https://netspresso.ai?utm_source=git_yolo&utm_medium=text_np&utm_campaign=py_launch" target="_blank">NetsPresso</a> or <a href="https://py.netspresso.ai/?utm_source=git_yolo&utm_medium=text_py&utm_campaign=py_launch" target="_blank">PyNetsPresso</a>.
@@ -43,6 +45,13 @@ python train.py --data coco.yaml --epochs 300 --weights '' --cfg ./models/yolo-f
 ``` bash
 python auto_process.py --data coco.yaml --name yolo_fastest --weight_path yolo_fastest_uadetrac_4jh.pt --epochs 300 --batch-size 128 --np_email '' --np_password ''
 ```
+</br>
+
+## 4. Benchmark
+
+|Model                                                                                           | size<br><sup>(pixels) | mAP<sup>val<br>50-95 | mAP<sup>val<br>50 | Speed<br><sup>Cortex-M85<br>(ms) | Speed<br><sup>Cortex-M85 with helium<br>(ms) | Speed<br><sup>Ethos-U55<br>(ms) | params<br><sup>(M) |
+| ----------------------------------------------------------------------------------------------- | --------------------- | -------------------- | ----------------- | ---------------------------- | ----------------------------- | ------------------------------ | ------------------ |
+| [YOLO-Fastest](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_uadetrac_256.pt)              | 256                   | 24.0                 | 43.2              | **593**                       | **253**                       | **6.7**                        | **0.3**            |
 
 ## <div align="center">Contact</div>
 
