@@ -42,7 +42,7 @@ python train.py --data coco.yaml --epochs 300 --weights '' --cfg ./models/yolo-f
 `auto_process.py` provides integrated process which contains torch.fx converting, model compression, fx model retraining, and onnx exporting. You can execute `auto_process.py` with minimal training hyper-parameters and NetsPresso account information.
 
 ``` bash
-python auto_process.py --data coco.yaml --name yolo_fastest --weight_path yolo_fastest_uadetrac_4jh.pt --epochs 300 --batch-size 128 --np_email '' --np_password ''
+python auto_process.py --data coco.yaml --name yolo_fastest --weight_path ./models/yolo_fastest_uadetrac_256.pt --epochs 300 --batch-size 128 --np_email '' --np_password ''
 ```
 </br>
 
