@@ -87,9 +87,9 @@ if __name__ == '__main__':
         assert args.device != 'cpu', "Cannot export model to fp16 onnx with cpu mode!!"
 
     """ 
-        Convert YOLOv5 model to fx 
+        Convert YOLO_Fastest model to fx 
     """
-    logger.info("yolov5 to fx graph start.")
+    logger.info("yolo_fastest to fx graph start.")
 
     model = torch.load(args.weight_path, map_location='cpu')
 
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     torch.save(model, f'{args.name}_fx.pt')
     torch.save(model_head, f'{args.name}_head.pt')
     
-    logger.info("yolov5 to fx graph end.")
+    logger.info("yolo_fastest to fx graph end.")
 
     """
         Model compression - recommendation compression 
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     logger.info("Compression step end.")
 
     """
-        Retrain YOLOv5 model
+        Retrain YOLO_Fastest model
     """
     logger.info("Fine-tuning step start.")
 
@@ -181,7 +181,7 @@ if __name__ == '__main__':
     logger.info("Fine-tuning step end.")
 
     """ 
-        Export YOLOv5 model to onnx
+        Export YOLO_Fastest model to onnx
     """
     logger.info("Export model to onnx format step start.")
     
