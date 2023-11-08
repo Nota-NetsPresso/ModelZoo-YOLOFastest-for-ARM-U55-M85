@@ -12,7 +12,6 @@
 [1. Install](#1-install) </br>
 [2. Training](#2-training) </br>
 [3. Compress model and export to onnx with PyNetsPresso](#3-compress-model-and-export-to-onnx-with-pynetspresso) </br>
-[4. Benchmark](#4-benchmark) </br>
 </br>
 
 
@@ -47,11 +46,21 @@ python auto_process.py --data coco.yaml --name yolo_fastest --weight_path yolo_f
 ```
 </br>
 
-## 4. Benchmark
+## Benchmark
 
-|Model                                                                                           | size<br><sup>(pixels) | mAP<sup>val<br>50-95 | mAP<sup>val<br>50 | Speed<br><sup>Cortex-M85<br>(ms) | Speed<br><sup>Cortex-M85 with helium<br>(ms) | Speed<br><sup>Ethos-U55<br>(ms) | params<br><sup>(M) |
-| ----------------------------------------------------------------------------------------------- | --------------------- | -------------------- | ----------------- | ---------------------------- | ----------------------------- | ------------------------------ | ------------------ |
-| [YOLO-Fastest](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_uadetrac_256.pt)              | 256                   | 24.0                 | 43.2              | **593**                       | **253**                       | **6.7**                        | **0.3**            |
+|Model                                                                                           | Precision| Size<br><sup>(pixels) | mAP<sup>val<br>50-95 | mAP<sup>val<br>50 | Speed<br><sup>Cortex-M85<br>(ms) | Speed<br><sup>Cortex-M85 with helium<br>(ms) | Speed<br><sup>Ethos-U55<br>(ms) | Params<br><sup>(M) |
+| ----------------------------------------------------------------------------------------------- | -----|--------------------- | -------------------- | ----------------- | ---------------------------- | ----------------------------- | ------------------------------ | ------------------ |
+| [YOLO-Fastest ckpt](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_uadetrac_256.pt)           |FP32   | 256                   | 23.5                 | 42.1              | **-**                       | **-**                       | **-**                        | **0.3**            |
+[YOLO-Fastest TFLite](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_uadetrac_256.pt)     |INT8         | 256                   | 24.0                 | 43.2              | **593**                       | **253**                       | **6.7**                        | **0.3**            |
+<details>
+  <summary>Table Notes</summary>
+
+- The checkpoint is trained to 100 epochs with default settings. The model uses [hyp.scratch-low.yaml](https://github.com/ultralytics/yolov5/blob/master/data/hyps/hyp.scratch-low.yaml) hyps.
+- **mAP<sup>val</sup>** values are for single-model single-scale on [UA-DETRAC](https://detrac-db.rit.albany.edu/) dataset.<br>Reproduce by `python val.py --weights './models/yolo_fastest_uadetrac_256.pt' --data ./data/UA-DETRAC.yaml --img 256` for ckpt file, and
+ `python val.py --weights './models/yolo_fastest_uadetrac_full_int8_256.tflite' --data ./data/UA-DETRAC.yaml --img 256` for tflite file.
+- **Speed** inference UA-DETRAC val image using Cortex-M85 (with/without helium) and Ethos-U55.<br>
+
+</details>
 
 ## <div align="center">Contact</div>
 
