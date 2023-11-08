@@ -6,14 +6,12 @@
 
 </div>
 
-# <div align="center">NetsPresso tutorial for YOLOv5 compression</div>
+# <div align="center">NetsPresso tutorial for YOLO Fastest compression</div>
 ## Order of the tutorial
 [0. Sign up](#0-sign-up) </br>
 [1. Install](#1-install) </br>
 [2. Training](#2-training) </br>
-[3. Convert YOLOv5 to _torchfx.pt](#3-convert-yolov5-to-_torchfxpt) </br>
-[4. Model compression with NetsPresso Python Package](#4-model-compression-with-netspresso-python-package)</br>
-[5. Fine-tuning the compressed model](#5-fine-tuning-the-compressed-model)</br>
+[3. Compress model and export to onnx with PyNetsPresso](#3-compress-model-and-export-to-onnx-with-pynetspresso) </br>
 </br>
 
 ## 0. Sign up
@@ -21,12 +19,12 @@ To get started with the NetsPresso Python package, you will need to sign up eith
 </br>
 
 ## 1. Install
-Clone repo and install [requirements.txt](https://github.com/ultralytics/yolov5/blob/master/requirements.txt) in a
+Clone repo and install [requirements.txt](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/blob/master/requirements.txt) in a
 [**Python>=3.7.0**](https://www.python.org/) environment, including
 [**PyTorch >= 1.11, < 2.0**](https://pytorch.org/get-started/locally/).
 ```bash
 git clone https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85.git  # clone
-cd yolov5_nota
+cd ModelZoo-YOLOFastest-for-ARM-U55-M85
 pip install -r requirements.txt  # install
 ```
 </br>
