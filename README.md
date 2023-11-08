@@ -24,9 +24,8 @@ To get started with the NetsPresso Python package, you will need to sign up eith
 Clone repo and install [requirements.txt](https://github.com/ultralytics/yolov5/blob/master/requirements.txt) in a
 [**Python>=3.7.0**](https://www.python.org/) environment, including
 [**PyTorch >= 1.11, < 2.0**](https://pytorch.org/get-started/locally/).
-
 ```bash
-git clone https://github.com/Nota-NetsPresso/yolov5_nota.git  # clone
+git clone https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85.git  # clone
 cd yolov5_nota
 pip install -r requirements.txt  # install
 ```
@@ -35,11 +34,7 @@ pip install -r requirements.txt  # install
 ## 2. Training
 If you want to start from scratch, create a '.pt' file via 'train.py'.
 ```bash
-python train.py --data coco.yaml --epochs 300 --weights '' --cfg yolov5n.yaml  --batch-size 128
-                                                                 yolov5s                    64
-                                                                 yolov5m                    40
-                                                                 yolov5l                    24
-                                                                 yolov5x                    16
+python train.py --data coco.yaml --epochs 300 --weights '' --cfg ./models/yolo-fastest.yaml  --batch-size 32
 ```
 </br>
 
