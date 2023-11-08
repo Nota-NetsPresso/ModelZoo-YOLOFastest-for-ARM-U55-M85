@@ -382,7 +382,7 @@ class Concat(nn.Module):
 
 class DetectMultiBackend(nn.Module):
     # YOLOv5 MultiBackend class for python inference on various backends
-    def __init__(self, weights='yolov5s.pt', device=torch.device('cpu'), dnn=False, data=None, fp16=False, fuse=True):
+    def __init__(self, weights='yolov5s.pt', device=torch.device('cpu'), dnn=False, data=None, fp16=False, fuse=True, swap_output_order=False):
         # Usage:
         #   PyTorch:              weights = *.pt
         #   TorchScript:                    *.torchscript
@@ -530,6 +530,7 @@ class DetectMultiBackend(nn.Module):
             else:  # TFLite
                 LOGGER.info(f'Loading {w} for TensorFlow Lite inference...')
                 interpreter = Interpreter(model_path=w)  # load TFLite model
+                self.swap_output_order = swap_output_order
             interpreter.allocate_tensors()  # allocate
             input_details = interpreter.get_input_details()  # inputs
             output_details = interpreter.get_output_details()  # outputs
@@ -632,21 +633,30 @@ class DetectMultiBackend(nn.Module):
                 y = self.frozen_func(x=self.tf.constant(im))
             else:  # Lite or Edge TPU
                 input = self.input_details[0]
-                int8 = input['dtype'] == np.uint8  # is TFLite quantized uint8 model
-                if int8:
+
+                # Check if the model input type is uint8 or np.int8
+                uint8 = (input['dtype'] == np.uint8)
+                int8 = (input['dtype'] == np.int8)
+
+                if uint8 or int8:
                     scale, zero_point = input['quantization']
-                    im = (im / scale + zero_point).astype(np.uint8)  # de-scale
+                    im = im / scale + zero_point
+                    im = im.astype(np.uint8) if uint8 else im.astype(np.int8)
+                    
                 self.interpreter.set_tensor(input['index'], im)
                 self.interpreter.invoke()
                 y = []
                 for output in self.output_details:
                     x = self.interpreter.get_tensor(output['index'])
-                    if int8:
+                    if uint8 or int8:
                         scale, zero_point = output['quantization']
                         x = (x.astype(np.float32) - zero_point) * scale  # re-scale
                     y.append(x)
+
             y = [x if isinstance(x, np.ndarray) else x.numpy() for x in y]
-            y[0][..., :4] *= [w, h, w, h]  # xywh normalized to pixels
+            if self.swap_output_order:
+                y[0], y[1] = y[1], y[0]
+            # y[0][..., :4] *= [w, h, w, h]  # xywh normalized to pixels
 
         if isinstance(y, (list, tuple)):
             return self.from_numpy(y[0]) if len(y) == 1 else [self.from_numpy(x) for x in y]

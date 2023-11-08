@@ -70,10 +70,10 @@ class Ensemble(nn.ModuleList):
         return y, None  # inference, train output
 
 
-def attempt_load(weights, device=None, inplace=True, fuse=True):
+def attempt_load(weights, device=None, inplace=True, fuse=True, exp_yolo_fastest=False):
     # Loads an ensemble of models weights=[a,b,c] or a single model weights=[a] or weights=a
-    from models.yolo import Detect, Model
-
+    from models.yolo import Detect, Model, Detect_infer
+    
     model = Ensemble()
     for w in weights if isinstance(weights, list) else [weights]:
         ckpt = torch.load(attempt_download(w), map_location='cpu')  # load
@@ -97,6 +97,8 @@ def attempt_load(weights, device=None, inplace=True, fuse=True):
                 setattr(m, 'anchor_grid', [torch.zeros(1)] * m.nl)
         elif t is nn.Upsample and not hasattr(m, 'recompute_scale_factor'):
             m.recompute_scale_factor = None  # torch 1.11.0 compatibility
+        elif t is Detect_infer and exp_yolo_fastest:
+             m.exp_yolo_fastest = True
 
     # Return model
     if len(model) == 1:
