@@ -104,6 +104,7 @@ if __name__ == '__main__':
     session = SessionClient(email=args.np_email, password=args.np_password)
     compressor = ModelCompressor(user_session=session)
     converter = ModelConverter(user_session=session)
+    benchmarker = ModelBenchmarker(user_session=session)
 
     """ 
         Convert YOLO_Fastest model to fx 
@@ -243,3 +244,19 @@ if __name__ == '__main__':
     converter.download_converted_model(conversion_task, dst=tflite_model)
 
     logger.info("Converting model to tflite step end.")
+
+    """
+        Benchmark on target device
+    """
+    logger.info("Benchmark step start.")
+
+    benchmark_model: Model = benchmarker.upload_model(tflite_model)
+    benchmark_task: BenchmarkTask = benchmarker.benchmark_model(
+        model=benchmark_model,
+        target_device_name=TARGET_DEVICE_NAME,
+        data_type=DATA_TYPE,
+        hardware_type=HardwareType.HELIUM,
+        wait_until_done=True
+    )
+
+    logger.info(f"model inference latency: {benchmark_task.latency} ms")
