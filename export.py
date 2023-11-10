@@ -722,8 +722,7 @@ def run(
         assert device.type != 'cpu' or coreml, '--half only compatible with GPU export, i.e. use --device 0'
         assert not dynamic, '--half not compatible with --dynamic, i.e. use either --half or --dynamic but not both'
     
-    exp_yolo_fastest = True
-    model = attempt_load(weights, device=device, inplace=True, fuse=True, exp_yolo_fastest=exp_yolo_fastest)  # load FP32 model
+    model = attempt_load(weights, device=device, inplace=True, fuse=True, exp_yolo_fastest=True)  # load FP32 model
 
     # Checks
     imgsz *= 2 if len(imgsz) == 1 else 1  # expand
