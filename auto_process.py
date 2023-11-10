@@ -90,6 +90,12 @@ def parse_args():
     """
     parser.add_argument('--export_half', action='store_true', default=False, help='Entity')
 
+    """
+        Converting and benchmark arguments
+    """
+    parser.add_argument('--target_device', type=str, choices=["Renesas-RA8D1", "Ensemble-E7-DevKit-Gen2"], default="Renesas-RA8D1")
+    parser.add_argument('--helium', action='store_true', default=False)
+
     return parser.parse_args()
 
 
@@ -225,7 +231,7 @@ if __name__ == '__main__':
     """
     logger.info("Converting model to tflite step start.")
 
-    TARGET_DEVICE_NAME = DeviceName.RENESAS_RA8D1
+    TARGET_DEVICE_NAME = args.target_device
     DATA_TYPE = DataType.INT8
 
     model: Model = converter.upload_model(onnx_model)
@@ -250,13 +256,16 @@ if __name__ == '__main__':
     """
     logger.info("Benchmark step start.")
 
+    hardware_type = HardwareType.HELIUM if args.helium else None
+
     benchmark_model: Model = benchmarker.upload_model(tflite_model)
     benchmark_task: BenchmarkTask = benchmarker.benchmark_model(
         model=benchmark_model,
         target_device_name=TARGET_DEVICE_NAME,
         data_type=DATA_TYPE,
-        hardware_type=HardwareType.HELIUM,
+        hardware_type=hardware_type,
         wait_until_done=True
     )
 
+    logger.info("Benchmark step end.")
     logger.info(f"model inference latency: {benchmark_task.latency} ms")
