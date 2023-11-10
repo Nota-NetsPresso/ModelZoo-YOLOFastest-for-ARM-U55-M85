@@ -7,7 +7,19 @@ import torch
 import torch.fx as fx
 from loguru import logger
 
+from netspresso.client import SessionClient
 from netspresso.compressor import ModelCompressor, Task, Framework
+from netspresso.launcher import (
+    ModelConverter,
+    ModelBenchmarker,
+    ModelFramework,
+    DeviceName,
+    BenchmarkTask,
+    ConversionTask,
+    Model,
+    DataType,
+    HardwareType,
+)
 
 import train
 from export import run
@@ -86,6 +98,13 @@ if __name__ == '__main__':
     if args.export_half:
         assert args.device != 'cpu', "Cannot export model to fp16 onnx with cpu mode!!"
 
+    """
+        Log in to NetsPresso
+    """
+    session = SessionClient(email=args.np_email, password=args.np_password)
+    compressor = ModelCompressor(user_session=session)
+    converter = ModelConverter(user_session=session)
+
     """ 
         Convert YOLO_Fastest model to fx 
     """
@@ -119,8 +138,6 @@ if __name__ == '__main__':
         Model compression - recommendation compression 
     """
     logger.info("Compression step start.")
-    
-    compressor = ModelCompressor(email=args.np_email, password=args.np_password)
 
     UPLOAD_MODEL_NAME = args.name
     TASK = Task.OBJECT_DETECTION
