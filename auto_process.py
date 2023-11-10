@@ -212,8 +212,34 @@ if __name__ == '__main__':
     )
 
     file_name = onnx_save_path[0].split('/')[-1]
-    shutil.move(onnx_save_path[0], COMPRESSED_MODEL_NAME + '.onnx')
+    onnx_model = COMPRESSED_MODEL_NAME + '.onnx'
+    shutil.move(onnx_save_path[0], onnx_model)
     
     logger.info(f'=> saving model to {COMPRESSED_MODEL_NAME}.onnx')
 
     logger.info("Export model to onnx format step end.")
+
+    """
+        Convert YOLO_Fastest onnx model to tflite
+    """
+    logger.info("Converting model to tflite step start.")
+
+    TARGET_DEVICE_NAME = DeviceName.RENESAS_RA8D1
+    DATA_TYPE = DataType.INT8
+
+    model: Model = converter.upload_model(onnx_model)
+    conversion_task: ConversionTask = converter.convert_model(
+        model=model,
+        input_shape=model.input_shape,
+        target_framework=ModelFramework.TENSORFLOW_LITE,
+        target_device_name=TARGET_DEVICE_NAME,
+        data_type=DATA_TYPE,
+        wait_until_done=True,
+    )
+
+    logger.info(conversion_task)
+
+    tflite_model = onnx_model.replace('.onnx', '.tflite')
+    converter.download_converted_model(conversion_task, dst=tflite_model)
+
+    logger.info("Converting model to tflite step end.")
