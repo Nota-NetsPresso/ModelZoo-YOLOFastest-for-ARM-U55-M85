@@ -39,10 +39,11 @@ python train.py --data coco.yaml --epochs 300 --weights '' --cfg ./models/yolo-f
 
 ## 3. Compress model and export to onnx with PyNetsPresso
 
-`auto_process.py` provides integrated process which contains torch.fx converting, model compression, fx model retraining, and onnx exporting. You can execute `auto_process.py` with minimal training hyper-parameters and NetsPresso account information.
+`auto_process.py` provides integrated process which contains torch.fx converting, model compression, fx model retraining, onnx exporting, tflite converting, and device benchmark. You can execute `auto_process.py` with minimal training hyper-parameters and NetsPresso account information.
 
+You can choose Renesas-RA8D1 or Ensemble-E7-DevKit-Gen2 device, and boost inference speed by giving helium option.
 ``` bash
-python auto_process.py --data coco.yaml --name yolo_fastest --weight_path ./models/yolo_fastest_uadetrac_256.pt --epochs 300 --batch-size 128 --np_email '' --np_password ''
+python auto_process.py --data coco.yaml --name yolo_fastest --weight_path ./models/yolo_fastest_uadetrac_256.pt --epochs 300 --batch-size 128 --np_email '' --np_password '' --target_device Renesas-RA8D1 --helium
 ```
 </br>
 
