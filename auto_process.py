@@ -76,7 +76,7 @@ def parse_args():
     """
         Export arguments
     """
-    parser.add_argument('--export_half', action='store_true', default=True, help='Entity')
+    parser.add_argument('--export_half', action='store_true', default=False, help='Entity')
 
     return parser.parse_args()
 
