@@ -7,7 +7,19 @@ import torch
 import torch.fx as fx
 from loguru import logger
 
+from netspresso.client import SessionClient
 from netspresso.compressor import ModelCompressor, Task, Framework
+from netspresso.launcher import (
+    ModelConverter,
+    ModelBenchmarker,
+    ModelFramework,
+    DeviceName,
+    BenchmarkTask,
+    ConversionTask,
+    Model,
+    DataType,
+    HardwareType,
+)
 
 import train
 from export import run
@@ -39,7 +51,7 @@ def parse_args():
     parser.add_argument('--hyp', type=str, default='data/hyps/hyp.scratch-low.yaml', help='hyperparameters path')
     parser.add_argument('--epochs', type=int, default=100, help='total training epochs')
     parser.add_argument('--batch-size', type=int, default=16, help='total batch size for all GPUs, -1 for autobatch')
-    parser.add_argument('--imgsz', '--img', '--img-size', type=int, default=640, help='train, val image size (pixels)')
+    parser.add_argument('--imgsz', '--img', '--img-size', type=int, default=256, help='train, val image size (pixels)')
     parser.add_argument('--rect', action='store_true', help='rectangular training')
     parser.add_argument('--resume', nargs='?', const=True, default=False, help='resume most recent training')
     parser.add_argument('--nosave', action='store_true', help='only save final checkpoint')
@@ -76,7 +88,13 @@ def parse_args():
     """
         Export arguments
     """
-    parser.add_argument('--export_half', action='store_true', default=True, help='Entity')
+    parser.add_argument('--export_half', action='store_true', default=False, help='Entity')
+
+    """
+        Converting and benchmark arguments
+    """
+    parser.add_argument('--target_device', type=str, choices=["Renesas-RA8D1", "Ensemble-E7-DevKit-Gen2"], default="Renesas-RA8D1")
+    parser.add_argument('--helium', action='store_true', default=False)
 
     return parser.parse_args()
 
@@ -85,6 +103,14 @@ if __name__ == '__main__':
     args = parse_args()
     if args.export_half:
         assert args.device != 'cpu', "Cannot export model to fp16 onnx with cpu mode!!"
+
+    """
+        Log in to NetsPresso
+    """
+    session = SessionClient(email=args.np_email, password=args.np_password)
+    compressor = ModelCompressor(user_session=session)
+    converter = ModelConverter(user_session=session)
+    benchmarker = ModelBenchmarker(user_session=session)
 
     """ 
         Convert YOLO_Fastest model to fx 
@@ -119,8 +145,6 @@ if __name__ == '__main__':
         Model compression - recommendation compression 
     """
     logger.info("Compression step start.")
-    
-    compressor = ModelCompressor(email=args.np_email, password=args.np_password)
 
     UPLOAD_MODEL_NAME = args.name
     TASK = Task.OBJECT_DETECTION
@@ -195,8 +219,53 @@ if __name__ == '__main__':
     )
 
     file_name = onnx_save_path[0].split('/')[-1]
-    shutil.move(onnx_save_path[0], COMPRESSED_MODEL_NAME + '.onnx')
+    onnx_model = COMPRESSED_MODEL_NAME + '.onnx'
+    shutil.move(onnx_save_path[0], onnx_model)
     
     logger.info(f'=> saving model to {COMPRESSED_MODEL_NAME}.onnx')
 
     logger.info("Export model to onnx format step end.")
+
+    """
+        Convert YOLO_Fastest onnx model to tflite
+    """
+    logger.info("Converting model to tflite step start.")
+
+    TARGET_DEVICE_NAME = args.target_device
+    DATA_TYPE = DataType.INT8
+
+    model: Model = converter.upload_model(onnx_model)
+    conversion_task: ConversionTask = converter.convert_model(
+        model=model,
+        input_shape=model.input_shape,
+        target_framework=ModelFramework.TENSORFLOW_LITE,
+        target_device_name=TARGET_DEVICE_NAME,
+        data_type=DATA_TYPE,
+        wait_until_done=True,
+    )
+
+    logger.info(conversion_task)
+
+    tflite_model = onnx_model.replace('.onnx', '.tflite')
+    converter.download_converted_model(conversion_task, dst=tflite_model)
+
+    logger.info("Converting model to tflite step end.")
+
+    """
+        Benchmark on target device
+    """
+    logger.info("Benchmark step start.")
+
+    hardware_type = HardwareType.HELIUM if args.helium else None
+
+    benchmark_model: Model = benchmarker.upload_model(tflite_model)
+    benchmark_task: BenchmarkTask = benchmarker.benchmark_model(
+        model=benchmark_model,
+        target_device_name=TARGET_DEVICE_NAME,
+        data_type=DATA_TYPE,
+        hardware_type=hardware_type,
+        wait_until_done=True
+    )
+
+    logger.info("Benchmark step end.")
+    logger.info(f"model inference latency: {benchmark_task.latency} ms")
