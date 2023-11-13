@@ -22,6 +22,7 @@ from netspresso.launcher import (
 )
 
 import train
+import val
 from export import run
 
 
@@ -96,6 +97,11 @@ def parse_args():
     parser.add_argument('--target_device', type=str, choices=["Renesas-RA8D1", "Ensemble-E7-DevKit-Gen2"], default="Renesas-RA8D1")
     parser.add_argument('--helium', action='store_true', default=False)
 
+    """
+        TFLite file inference arguments
+    """
+    parser.add_argument('--swap_output_order', action='store_true', default=False)
+
     return parser.parse_args()
 
 
@@ -122,22 +128,25 @@ if __name__ == '__main__':
     #save model_torchfx.pt
     if isinstance(model, torch.nn.Sequential):
         model.train()
-        model[-1].export = False
         model_head = model[-1]
+        model_head.export = False
+        model_head.float()
+        torch.save(model_head, f'{args.name}_head.pt')
         model = model[0]        
     else:
         model = model['model']
         model.train()
-        model.model[-1].export = False
         model_head = model.model[-1]
+        model_head.export = False
+        model_head.float()
+        torch.save(model_head, f'{args.name}_head.pt')
+        model.model[-1].exp_yolo_fastest = True
         
         _graph = fx.Tracer().trace(model)
         model = fx.GraphModule(model, _graph)
 
     model.float()
-    model_head.float()
     torch.save(model, f'{args.name}_fx.pt')
-    torch.save(model_head, f'{args.name}_head.pt')
     
     logger.info("yolo_fastest to fx graph end.")
 
@@ -269,3 +278,19 @@ if __name__ == '__main__':
 
     logger.info("Benchmark step end.")
     logger.info(f"model inference latency: {benchmark_task.latency} ms")
+
+    """
+        TFLite file inference
+    """
+    logger.info("TFLite file inference step start.")
+
+    val.run(
+        data=args.data,
+        weights=tflite_model,
+        task='val',
+        imgsz=args.imgsz,
+        anchors_for_tflite_path=train_opt.save_dir + '/weights/anchors.json',
+        swap_output_order=args.swap_output_order,
+    )
+
+    logger.info("TFLite file inference step end.")

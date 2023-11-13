@@ -1,0 +1,44 @@
+path: ../datasets/UA-DETRAC
+train: images/train
+val: images/val
+test:
+
+nc: 5
+names: ['others', 'car', 'van', 'bus']
+
+# Download script/URL (optional)
+download: |
+        from utils.general import download, Path
+
+        dir = Path(yaml['path'])  # dataset root dir
+
+        # Download label
+        url = ['https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/releases/download/datasets/labels.zip']  # labels
+        download(url, dir=dir)
+
+        # Download data
+        urls = ['https://detrac-db.rit.albany.edu/Data/DETRAC-train-data.zip',
+                'https://detrac-db.rit.albany.edu/Data/DETRAC-test-data.zip',]
+        download(urls, dir=dir / 'images', delete=False, threads=3)
+        
+        import shutil
+        import os
+        
+        os.makedirs(str(dir) + '/images/train')
+        os.makedirs(str(dir) + '/images/val')
+
+        for video_name in os.listdir(str(dir) + '/images/Insight-MVT_Annotation_Train'):
+            for i, img_name in enumerate(os.listdir(os.path.join(str(dir) + '/images/Insight-MVT_Annotation_Train', video_name))):
+                ori_path = os.path.join(str(dir) + '/images/Insight-MVT_Annotation_Train', video_name, img_name)
+                new_path = os.path.join(str(dir) + '/images/train', video_name + '_' + img_name)
+                shutil.copyfile(ori_path, new_path)
+        
+        print('UA-DETRAC training set image has been generated.')
+
+        for video_name in os.listdir(str(dir) + '/images/Insight-MVT_Annotation_Test'):
+            for i, img_name in enumerate(os.listdir(os.path.join(str(dir) + '/images/Insight-MVT_Annotation_Test', video_name))):
+                ori_path = os.path.join(str(dir) + '/images/Insight-MVT_Annotation_Test', video_name, img_name)
+                new_path = os.path.join(str(dir) + '/images/val', video_name + '_' + img_name)
+                shutil.copyfile(ori_path, new_path)
+
+        print('UA-DETRAC validation set image has been generated.')
