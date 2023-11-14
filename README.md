@@ -10,8 +10,9 @@
 ## Order of the tutorial
 [0. Sign up](#0-sign-up) </br>
 [1. Install](#1-install) </br>
-[2. Training](#2-training) </br>
-[3. Compress model and export to onnx with PyNetsPresso](#3-compress-model-and-export-to-onnx-with-pynetspresso) </br>
+[2. Prepare STREETS dataset](#2-prepare-streets-dataset) </br>
+[3. Training](#2-training) </br>
+[4. Compress model, convert to tflite, and benchmark with PyNetsPresso](#4-compress-model-convert-to-tflite-and-benchmark-with-pynetspresso) </br>
 </br>
 
 
@@ -30,20 +31,33 @@ pip install -r requirements.txt  # install
 ```
 </br>
 
-## 2. Training
-If you want to start from scratch, create a '.pt' file via 'train.py'.
-```bash
-python train.py --data ./data/UA-DETRAC.yaml --epochs 300 --weights '' --cfg ./models/yolo-fastest.yaml  --batch-size 32
+## 2. Prepare STREETS dataset
+Download the STREETS dataset and annotations from [link](https://databank.illinois.edu/datafiles/ht2io/download), unzip, and move the vehicleannotaitons folder to ../dataset/ directory
+
+```
+Your code structure should like
+--datasets
+  |-- vehicleannotaitons
+    --images
+    --annotations
+--Modeloo
 ```
 </br>
 
-## 3. Compress model and export to tflite with PyNetsPresso
+## 3. Training
+If you want to start from scratch, create a '.pt' file via 'train.py'.
+```bash
+python train.py --data ./data/streets.yaml --epochs 100 --weights '' --cfg ./models/yolo-fastest.yaml  --batch-size 32
+```
+</br>
+
+## 4. Compress model, convert to tflite, and benchmark with PyNetsPresso
 
 `auto_process.py` provides integrated process which contains torch.fx converting, model compression, fx model retraining, onnx exporting, tflite converting, device benchmark, and mAP validation. You can execute `auto_process.py` with minimal training hyper-parameters and NetsPresso account information.
 
 You can choose Renesas-RA8D1 (Arm Cortex-M85) or Ensemble-E7-DevKit-Gen2 (Arm Cortex-M55 + Ethos-U55) device, and boost inference speed by giving Helium option.
 ``` bash
-python auto_process.py --data ./data/UA-DETRAC.yaml --name yolo_fastest --weight_path ./models/yolo_fastest_uadetrac_256.pt --epochs 300 --batch-size 32 --np_email '' --np_password '' --target_device Renesas-RA8D1 --helium
+python auto_process.py --data ./data/streets.yaml --name yolo_fastest --weight_path ./models/yolo_fastest_streets.pt --epochs 100 --batch-size 32 --np_email '' --np_password '' --target_device Renesas-RA8D1 --helium
 ```
 </br>
 
@@ -51,7 +65,7 @@ python auto_process.py --data ./data/UA-DETRAC.yaml --name yolo_fastest --weight
 
 |Model                                                                                           | Precision| Size<br><sup>(pixels) | mAP<sup>val<br>50-95 | mAP<sup>val<br>50 | Speed<br><sup>Cortex-M85<br>(ms) | Speed<br><sup>Cortex-M85 with Helium<br>(ms) | Speed<br><sup>Ethos-U55<br>(ms) | Params<br><sup>(M) |
 | ----------------------------------------------------------------------------------------------- | -----|--------------------- | -------------------- | ----------------- | ---------------------------- | ----------------------------- | ------------------------------ | ------------------ |
-| [YOLO-Fastest ckpt](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_uadetrac_256.pt)           |FP32   | 256                   | 23.5                 | 42.1              | **-**                       | **-**                       | **-**                        | **0.3**            |
+| [YOLO-Fastest](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_uadetrac_256.pt)           |FP32   | 256                   | 23.5                 | 42.1              | **-**                       | **-**                       | **-**                        | **0.3**            |
 [YOLO-Fastest TFLite](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_uadetrac_full_int8_256.tflite)     | Full INT8         | 256                   | 24.0                 | 43.2              | **593**                       | **253**                       | **6.7**                        | **0.3**            |
 <details>
   <summary>Table Notes</summary>

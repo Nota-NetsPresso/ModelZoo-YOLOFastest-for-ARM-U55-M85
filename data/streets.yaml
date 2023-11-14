@@ -1,0 +1,118 @@
+path: ../datasets/streets
+train: images/train
+val: images/val
+test:
+
+nc: 1
+names: ['car']
+
+download: |
+    
+    import json
+    import os
+    import random
+    import shutil
+    from utils.general import download, Path
+    from pathlib import Path
+    import cv2
+
+    dir = Path(yaml['path'])  # dataset root dir
+    print(dir, type(dir))
+
+    image_dir_train = str(dir) + '/images/train'
+    image_dir_val = str(dir) + '/images/val'
+    os.makedirs(image_dir_train)
+    os.makedirs(image_dir_val)
+
+    image_dir = str(dir.parent) + '/vehicleannotations/images/'
+    list_dir = os.listdir(image_dir)
+    num_files = len(list_dir)
+
+    random.seed(10)
+    val_list = random.sample(list_dir, int(num_files / 10))
+    train_list = [x for x in list_dir if x not in val_list]
+    print(len(train_list), len(val_list))
+
+    for file in train_list:
+        os.rename(image_dir + file, image_dir + file.replace(' ', '_'))
+        shutil.copyfile(image_dir + file.replace(' ', '_'), str(dir) + '/images/train/' + file.replace(' ', '_'))
+
+    for file in val_list:
+        os.rename(image_dir + file, image_dir + file.replace(' ', '_'))
+        shutil.copyfile(image_dir + file.replace(' ', '_'), str(dir) + '/images/val/' + file.replace(' ', '_'))
+
+
+    # Convert VIA to YOLOv5 annotation format
+    def create_txt_files(via_json_file, images_folder, txt_dest_folder, label_idx_dictionary):
+        """
+        Input:
+        via_json_file = json file exported from VIA annotator
+        images_folder = path folder containing images
+        txt_dest_folder = destination folder for txt files
+        label_idx_dictionary = dictionary whose keys are label names
+                            in VIA annotator and values are the
+                            corresponding integers to be use for
+                            YOLOv3. For example:
+                            'label0': 0, 'label1':1, 'label3': 3}
+        attribute_name = attribute name used in VIA annotator
+        Output:
+            Side effects: it creates .txt files whose names correspond
+                        to the images names in the train folder.
+            None
+        """
+        data = json.load(open(via_json_file, "r"))
+        for (name, file_data) in data.items():
+            regions = file_data["regions"]
+            image_name = file_data["filename"].replace(' ', '_')
+            image_path = os.path.join(images_folder, image_name)
+            if len(regions) == 0:
+                continue
+            try:
+                image_height, image_width, _ = cv2.imread(image_path).shape
+
+                for region in regions:
+                    temp = regions[region]
+                    shape_attributes = temp["shape_attributes"]
+                    all_x = shape_attributes['all_points_x']
+                    all_y = shape_attributes['all_points_y']
+                    mx_x, mi_x = max(all_x), min(all_x)
+                    mx_y, mi_y = max(all_y), min(all_y)
+                    width = mx_x - mi_x
+                    height = mx_y - mi_y
+                    label_idx = label_idx_dictionary[temp["region_attributes"]['vehicle_type']]
+                    x_center = mi_x + width / 2
+                    y_center = mi_y + height / 2
+                    x_center_norm = x_center / image_width
+                    y_center_norm = y_center / image_height
+                    width_norm = width / image_width
+                    if width_norm < 0.05:
+                        continue
+                    height_norm = height / image_height
+                    f = open(os.path.join(txt_dest_folder, os.path.splitext(image_name)[0] + ".txt"), "a+")
+                    f.write(f"{label_idx} {round(x_center_norm, 4)} {round(y_center_norm, 4)} {round(width_norm, 4)} {round(height_norm, 4)}\n")
+                    f.close()
+            except (AttributeError, IOError, SyntaxError):
+                pass
+        return
+
+    label_dir_train = str(dir) + '/labels/train'
+    label_dir_val = str(dir) + '/labels/val'
+    os.makedirs(label_dir_train)
+    os.makedirs(label_dir_val)
+
+    json_dir = str(dir.parent) + '/vehicleannotations/annotations/vehicle-annotations.json'
+
+    create_txt_files(
+        via_json_file=json_dir,
+        images_folder=image_dir_train,
+        txt_dest_folder=label_dir_train,
+        label_idx_dictionary={"car":0},
+    )
+
+    create_txt_files(
+        via_json_file=json_dir,
+        images_folder=image_dir_val,
+        txt_dest_folder=label_dir_val,
+        label_idx_dictionary={"car":0},
+    )
+    
