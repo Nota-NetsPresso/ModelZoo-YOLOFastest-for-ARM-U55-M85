@@ -100,7 +100,7 @@ def parse_args():
     """
         TFLite file inference arguments
     """
-    parser.add_argument('--swap_output_order', action='store_true', default=False)
+    parser.add_argument('--swap_output_order', action='store_true')
 
     return parser.parse_args()
 
@@ -125,28 +125,18 @@ if __name__ == '__main__':
 
     model = torch.load(args.weight_path, map_location='cpu')
 
-    #save model_torchfx.pt
-    if isinstance(model, torch.nn.Sequential):
-        model.train()
-        model_head = model[-1]
-        model_head.export = False
-        model_head.float()
-        torch.save(model_head, f'{args.name}_head.pt')
-        model = model[0]
-    else:
-        model = model['model']
-        model.train()
-        model_head = model.model[-1]
-        model_head.export = False
-        model_head.float()
-        torch.save(model_head, f'{args.name}_head.pt')
-        model.model[-1].exp_yolo_fastest = True
-        
-        _graph = fx.Tracer().trace(model)
-        model = fx.GraphModule(model, _graph)
+    # save model_torchfx.pt
+    model = model['model']
+    model.train()
+    model_head = model.model[-1]
+    model_head.export = False
+    model_head.float()
+    torch.save(model_head, f'{args.name}_head.pt')
+    model.model[-1].exp_yolo_fastest = True
+    
+    _graph = fx.Tracer().trace(model)
+    model = fx.GraphModule(model, _graph)
 
-    model.float()
-    torch.save(model, f'{args.name}_fx.pt')
     
     logger.info("yolo_fastest to fx graph end.")
 
@@ -289,7 +279,7 @@ if __name__ == '__main__':
         weights=tflite_model,
         task='val',
         imgsz=args.imgsz,
-        anchors_for_tflite_path=train_opt.save_dir + '/weights/anchors.json',
+        anchors_for_tflite_path=train_opt.save_dir + '/anchors.json',
         swap_output_order=args.swap_output_order,
     )
 
