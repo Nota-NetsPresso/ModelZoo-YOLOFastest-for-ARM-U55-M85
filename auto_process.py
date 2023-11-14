@@ -132,7 +132,7 @@ if __name__ == '__main__':
         model_head.export = False
         model_head.float()
         torch.save(model_head, f'{args.name}_head.pt')
-        model = model[0]        
+        model = model[0]
     else:
         model = model['model']
         model.train()
@@ -263,7 +263,7 @@ if __name__ == '__main__':
     """
         Benchmark on target device
     """
-    logger.info("Benchmark step start.")
+    logger.info("Device benchmark step start.")
 
     hardware_type = HardwareType.HELIUM if args.helium else None
 
@@ -276,13 +276,13 @@ if __name__ == '__main__':
         wait_until_done=True
     )
 
-    logger.info("Benchmark step end.")
-    logger.info(f"model inference latency: {benchmark_task.latency} ms")
+    logger.info("Device benchmark step end.")
+    logger.info(f"Model inference latency: {benchmark_task.latency} ms")
 
     """
         TFLite file inference
     """
-    logger.info("TFLite file inference step start.")
+    logger.info("TFLite file mAP validation start.")
 
     val.run(
         data=args.data,
@@ -293,4 +293,4 @@ if __name__ == '__main__':
         swap_output_order=args.swap_output_order,
     )
 
-    logger.info("TFLite file inference step end.")
+    logger.info("TFLite file mAP validation end.")
