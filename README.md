@@ -10,8 +10,8 @@
 ## Order of the tutorial
 [0. Sign up](#0-sign-up) </br>
 [1. Install](#1-install) </br>
-[2. Prepare STREETS dataset](#2-prepare-streets-dataset) </br>
-[3. Training](#2-training) </br>
+[2. Prepare dataset](#2-prepare-dataset) </br>
+[3. Training](#3-training) </br>
 [4. Compress model, convert to tflite, and benchmark with PyNetsPresso](#4-compress-model-convert-to-tflite-and-benchmark-with-pynetspresso) </br>
 </br>
 
@@ -31,7 +31,7 @@ pip install -r requirements.txt  # install
 ```
 </br>
 
-## 2. Prepare STREETS dataset
+## 2. Prepare dataset
 Download the STREETS dataset and annotations from [link](https://databank.illinois.edu/datafiles/ht2io/download), unzip, and move the vehicleannotaitons folder to ../dataset/ directory
 
 ```
