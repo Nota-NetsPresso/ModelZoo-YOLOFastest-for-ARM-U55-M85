@@ -1,4 +1,15 @@
 <div align="center">
+    <img width="30%" src="https://github.com/Nota-NetsPresso/NetsPresso-Compatible-Models/blob/main/imgs/banner/pynp_arm_logo.png">
+</div>
+
+## <div align="center">NetsPresso tutorial with YOLO Fastest for Arm Cortex-M85 and Cortex-M55+Ethos-U55</div>
+PyNetspresso provides a comprehensive process for training, compressing, converting, and benchmarking the Yolo-Fastest model, ensuring optimal performance on Arm Cortex-M85 and Cortex-M55. Particularly useful for those seeking to seamlessly apply the Yolo-Fastest model to Arm processor, this repository facilitates efficient deployment and enhances the overall workflow.
+
+<div align="center">
+  <img width="100%" src="https://github.com/Nota-NetsPresso/NetsPresso-Compatible-Models/blob/main/imgs/banner/arm_content.png">
+</div>
+
+<div align="center">
   <p>
     <a align="center" target="_blank">
       <img width="100%" src="https://github.com/Nota-NetsPresso/NetsPresso-Compatible-Models/blob/main/imgs/banner/YOLO_fastest_banner.png"></a>
@@ -6,7 +17,6 @@
 
 </div>
 
-# <div align="center">NetsPresso tutorial for YOLO Fastest compression</div>
 ## Order of the tutorial
 [0. Sign up](#0-sign-up) </br>
 [1. Install](#1-install) </br>
