@@ -38,10 +38,11 @@ Download the STREETS dataset and annotations from [link](https://databank.illino
 Your code structure should like
 
 ├── datasets
-│    ├── vehicleannotaitons
-│    │    ├── images
-│    │    └── annotations
-└── ModelZoo
+│    └── vehicleannotaitons
+│         ├── images
+│         └── annotations
+│    
+└── ModelZoo-YOLOFastest-for-ARM-U55-M85
 
 ```
 </br>
@@ -49,7 +50,7 @@ Your code structure should like
 ## 3. Training
 If you want to start from scratch, create a '.pt' file via 'train.py'.
 ```bash
-python train.py --data ./data/streets.yaml --epochs 300 --weights '' --cfg ./models/yolo-fastest.yaml  --batch-size 512
+python train.py --data ./data/STREETS.yaml --epochs 300 --weights '' --cfg ./models/yolo-fastest.yaml  --batch-size 512
 ```
 </br>
 
@@ -59,7 +60,7 @@ python train.py --data ./data/streets.yaml --epochs 300 --weights '' --cfg ./mod
 
 You can choose Renesas-RA8D1 (Arm Cortex-M85) or Ensemble-E7-DevKit-Gen2 (Arm Cortex-M55 + Ethos-U55) device, and boost inference speed by giving Helium option.
 ``` bash
-python auto_process.py --data ./data/streets.yaml --name yolo_fastest --weight_path ./models/yolo_fastest_streets.pt --epochs 300 --batch-size 512 --np_email '' --np_password '' --target_device Renesas-RA8D1 --helium
+python auto_process.py --data ./data/STREETS.yaml --name yolo_fastest --weight_path ./models/yolo_fastest_streets.pt --epochs 300 --batch-size 512 --np_email '' --np_password '' --target_device Renesas-RA8D1 --helium
 ```
 </br>
 
@@ -73,7 +74,7 @@ python auto_process.py --data ./data/streets.yaml --name yolo_fastest --weight_p
   <summary>Table Notes</summary>
 
 - The checkpoint is trained to 300 epochs with default settings. The model uses [hyp.scratch-low.yaml](https://github.com/ultralytics/yolov5/blob/master/data/hyps/hyp.scratch-low.yaml) hyps.
-- **mAP<sup>val</sup>** values are for single-model single-scale on [STREETS](https://databank.illinois.edu/datasets/IDB-3671567) dataset.<br>Reproduce by `python val.py --weights './models/yolo_fastest_streets_256.pt' --data ./data/streets.yaml --img 256` for pytorch ckpt file, and
+- **mAP<sup>val</sup>** values are for single-model single-scale on [STREETS](https://databank.illinois.edu/datasets/IDB-3671567) dataset.<br>Reproduce by `python val.py --weights './models/yolo_fastest_streets_256.pt' --data ./data/STREETS.yaml --img 256` for pytorch ckpt file, and
  `python val.py --weights './models/yolo_fastest_streets_full_int8_256.tflite' --data ./data/UA-DETRAC.yaml --img 256--anchors-for-tflite-path /ssd1/tairen.piao/nota_github/ModelZoo-YOLOFastest-for-ARM-U55-M85/models/yolo_fastest_streets_256_anchors.json` for full int8 tflite file.
 - **Speed** inference a STREETS val image using Cortex-M85 (with/without helium) and Ethos-U55.<br>
 
