@@ -1,5 +1,5 @@
 <div align="center">
-    <img width="30%" src="https://github.com/Nota-NetsPresso/NetsPresso-Compatible-Models/blob/main/imgs/banner/pynp_arm_logo.png">
+    <img width="50%" src="https://github.com/Nota-NetsPresso/NetsPresso-Compatible-Models/blob/main/imgs/banner/pynp_arm_logo.png">
 </div>
 
 ## <div align="center">NetsPresso tutorial with YOLO Fastest for Arm Cortex-M85 and Cortex-M55+Ethos-U55</div>
@@ -12,7 +12,7 @@ PyNetspresso provides a comprehensive process for training, compressing, convert
 <div align="center">
   <p>
     <a align="center" target="_blank">
-      <img width="100%" src="https://github.com/Nota-NetsPresso/NetsPresso-Compatible-Models/blob/main/imgs/banner/YOLO_fastest_banner.png"></a>
+      <img width="100%" src="https://github.com/Nota-NetsPresso/NetsPresso-Compatible-Models/blob/main/imgs/banner/YOLO_fastest_line.png"></a>
   </p>
 
 </div>
