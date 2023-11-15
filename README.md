@@ -1,5 +1,9 @@
 <div align="center">
-    <img width="50%" src="https://github.com/Nota-NetsPresso/NetsPresso-Compatible-Models/blob/main/imgs/banner/pynp_arm_logo.png">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/Nota-NetsPresso/NetsPresso-Compatible-Models/blob/main/imgs/banner/pynp_arm_logo_white.png">
+        <source media="(prefers-color-scheme: light)" srcset="https://github.com/Nota-NetsPresso/NetsPresso-Compatible-Models/blob/main/imgs/banner/pynp_arm_logo.png">
+        <img alt="logo" src="https://github.com/Nota-NetsPresso/NetsPresso-Compatible-Models/blob/main/imgs/banner/pynp_arm_logo.png" width="50%">
+    </picture>
 </div>
 
 ## <div align="center">NetsPresso tutorial with YOLO Fastest for Arm Cortex-M85 and Cortex-M55+Ethos-U55</div>
