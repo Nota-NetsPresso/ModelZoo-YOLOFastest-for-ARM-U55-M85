@@ -76,7 +76,7 @@ Compressed YOLO-Fastest    |TFLite | Full INT8         | 256              | 37.3
 
 - The checkpoint is trained to 300 epochs with default settings. The model uses [hyp.scratch-low.yaml](https://github.com/ultralytics/yolov5/blob/master/data/hyps/hyp.scratch-low.yaml) hyps.
 - **mAP<sup>val</sup>** values are for single-model single-scale on the [STREETS](https://databank.illinois.edu/datasets/IDB-3671567) dataset.<br>Reproduce by `python val.py --weights './models/yolo_fastest_streets_256.pt' --data ./data/STREETS.yaml --img 256` for pytorch ckpt file, and
- `python val.py --weights './models/yolo_fastest_streets_full_int8_256.tflite' --data ./data/STREETS.yaml --img 256 --anchors-for-tflite-path /ssd1/tairen.piao/nota_github/ModelZoo-YOLOFastest-for-ARM-U55-M85/models/yolo_fastest_streets_256_anchors.json` for full int8 tflite file.
+ `python val.py --weights './models/yolo_fastest_streets_full_int8_256.tflite' --data ./data/STREETS.yaml --img 256 --anchors-for-tflite-path ./models/yolo_fastest_streets_256_anchors.json` for full int8 tflite file.
 - **Speed** is making inference for a STREETS val image using Cortex-M85 (with/without helium) and Ethos-U55.<br>
 
 </details>
