@@ -137,7 +137,6 @@ if __name__ == '__main__':
     _graph = fx.Tracer().trace(model)
     model = fx.GraphModule(model, _graph)
 
-    
     logger.info("yolo_fastest to fx graph end.")
 
     """
