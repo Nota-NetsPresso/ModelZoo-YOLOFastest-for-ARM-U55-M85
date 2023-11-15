@@ -66,18 +66,18 @@ python auto_process.py --data ./data/STREETS.yaml --name yolo_fastest --weight_p
 
 ## Benchmark
 
-|Model                                                                                           | Precision| Size<br><sup>(pixels) | mAP<sup>val<br>50-95 | mAP<sup>val<br>50 | Speed<br><sup>Cortex-M85<br>(ms) | Speed<br><sup>Cortex-M85 with Helium<br>(ms) | Speed<br><sup>Ethos-U55<br>(ms) | Params<br><sup>(M) |
-| ----------------------------------------------------------------------------------------------- | -----|--------------------- | -------------------- | ----------------- | ---------------------------- | ----------------------------- | ------------------------------ | ------------------ |
-| [YOLO-Fastest](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_uadetrac_256.pt)           |FP32   | 256                   | 41.6                | 75.5              | **-**                       | **-**                       | **-**                        | **0.3**            |
-[YOLO-Fastest TFLite](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_uadetrac_full_int8_256.tflite)     | Full INT8         | 256              | 39.7           | 72.8              | **594**                       | **269**                       | **6.8**                        | **0.3**            |
-[Compressed YOLO-Fastest TFLite](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_uadetrac_full_int8_256.tflite)     | Full INT8         | 256              | 37.3           | 71.5              | **513**                       | **234**                       | **6.0**                        | **0.2**            |
+|Model                                                                                           | Format|Precision| Size<br><sup>(pixels) | mAP<sup>val<br>50-95 | mAP<sup>val<br>50 | Speed<br><sup>Cortex-M85<br>(ms) | Speed<br><sup>Cortex-M85 with Helium<br>(ms) | Speed<br><sup>Ethos-U55<br>(ms) | Params<br><sup>(M) |
+|-------|-----|-----|--------------------- | -------------------- | ----------------- | ------------ | ----------------------------- | ------------------------------ | ------------------ |
+| [YOLO-Fastest](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_uadetrac_256.pt)           | PyTorch |FP32   | 256                   | 41.6                | 75.5              | **-**                       | **-**                       | **-**                        | **0.3**            |
+[YOLO-Fastest](https://github.com/Nota-NetsPresso/ModelZoo-YOLOFastest-for-ARM-U55-M85/tree/master/models/yolo_fastest_streets_full_int8_256.tflite)     | TFLite|Full INT8         | 256              | 39.7           | 72.8              | **594**                       | **269**                       | **6.8**                        | **0.3**            |
+Compressed YOLO-Fastest    |TFLite | Full INT8         | 256              | 37.3           | 71.5              | **513**                       | **234**                       | **6.0**                        | **0.2**            |
 <details>
   <summary>Table Notes</summary>
 
 - The checkpoint is trained to 300 epochs with default settings. The model uses [hyp.scratch-low.yaml](https://github.com/ultralytics/yolov5/blob/master/data/hyps/hyp.scratch-low.yaml) hyps.
-- **mAP<sup>val</sup>** values are for single-model single-scale on [STREETS](https://databank.illinois.edu/datasets/IDB-3671567) dataset.<br>Reproduce by `python val.py --weights './models/yolo_fastest_streets_256.pt' --data ./data/STREETS.yaml --img 256` for pytorch ckpt file, and
- `python val.py --weights './models/yolo_fastest_streets_full_int8_256.tflite' --data ./data/UA-DETRAC.yaml --img 256--anchors-for-tflite-path /ssd1/tairen.piao/nota_github/ModelZoo-YOLOFastest-for-ARM-U55-M85/models/yolo_fastest_streets_256_anchors.json` for full int8 tflite file.
-- **Speed** inference a STREETS val image using Cortex-M85 (with/without helium) and Ethos-U55.<br>
+- **mAP<sup>val</sup>** values are for single-model single-scale on the [STREETS](https://databank.illinois.edu/datasets/IDB-3671567) dataset.<br>Reproduce by `python val.py --weights './models/yolo_fastest_streets_256.pt' --data ./data/STREETS.yaml --img 256` for pytorch ckpt file, and
+ `python val.py --weights './models/yolo_fastest_streets_full_int8_256.tflite' --data ./data/STREETS.yaml --img 256 --anchors-for-tflite-path /ssd1/tairen.piao/nota_github/ModelZoo-YOLOFastest-for-ARM-U55-M85/models/yolo_fastest_streets_256_anchors.json` for full int8 tflite file.
+- **Speed** is making inference for a STREETS val image using Cortex-M85 (with/without helium) and Ethos-U55.<br>
 
 </details>
 
