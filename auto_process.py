@@ -40,7 +40,7 @@ def parse_args():
     parser.add_argument('-w', '--weight_path', type=str)
     parser.add_argument("--compression_method", type=str, choices=["PR_L2", "PR_GM", "PR_NN", "PR_ID", "FD_TK", "FD_CP", "FD_SVD"], default="PR_L2")
     parser.add_argument("--recommendation_method", type=str, choices=["slamp", "vbmf"], default="slamp")
-    parser.add_argument("--compression_ratio", type=int, default=0.3)
+    parser.add_argument("--compression_ratio", type=float, default=0.3)
     parser.add_argument("-m", "--np_email", help="NetsPresso login e-mail", type=str)
     parser.add_argument("-p", "--np_password", help="NetsPresso login password", type=str)
 
