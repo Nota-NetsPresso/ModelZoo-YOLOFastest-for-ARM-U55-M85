@@ -31,7 +31,7 @@ PyNetspresso provides a comprehensive process for training, compressing, convert
 
 
 ## 0. Sign up
-To get started with the NetsPresso Python package, you will need to sign up at <a href="https://netspresso.ai/?utm_source=git&utm_medium=text_np&utm_campaign=np_renew" target="_blank">NetsPresso</a>.
+To get started with the NetsPresso Python package, you will need to sign up at <a href="https://netspresso.ai/?utm_source=git_yolo&utm_medium=text_np&utm_campaign=np_renew" target="_blank">NetsPresso</a>.
 </br>
 
 ## 1. Install
