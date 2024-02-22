@@ -131,7 +131,7 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
             LOGGER.info(f"{colorstr('red', 'bold', 'Missing Path:')} {model_head_path} is a non-existent file path.")
             sys.exit()
             
-        model_head.netspresso = False
+        model_head.netspresso = True
         model_head.export = False
         model = nn.Sequential(
             model,
